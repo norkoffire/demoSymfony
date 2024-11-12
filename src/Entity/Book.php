@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use PhpParser\Builder\Enum_;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[UniqueEntity('isbn')]
 class Book
 {
     #[ORM\Id]
@@ -18,27 +20,41 @@ class Book
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank()]
+    #[Assert\Length(min: 1, max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    #[Assert\NotBlank()]
+    #[Assert\Isbn(
+        type: null,
+        message: 'Ce n\'est pas un ISBN valide'
+    )]
     #[ORM\Column(length: 255)]
     private ?string $isbn = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank()]
+    #[Assert\Url()]
     private ?string $cover = null;
 
+    #[Assert\NotBlank()]
     #[ORM\Column]
     private ?\DateTimeImmutable $editedAt = null;
 
+    #[Assert\NotBlank()]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $plot = null;
 
+    #[Assert\NotBlank()]
+    #[Assert\Type(type: Types::INTEGER)]
     #[ORM\Column]
     private ?int $pageNumber = null;
 
     #[ORM\Column(length: 255)]
     private ?BookStatus $status = null;
 
+    #[Assert\NotBlank()]
     #[ORM\ManyToOne(inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Editor $editor = null;
